@@ -1,7 +1,9 @@
 const TripRepository = require('../repositories/TripRepository');
+const SharedTripRepository = require('../repositories/SharedTripRepository');
 const { asyncHandler } = require('../middleware/errorHandler');
 
 const tripRepository = new TripRepository();
+const sharedTripRepository = new SharedTripRepository();
 
 class TripController {
   /**
