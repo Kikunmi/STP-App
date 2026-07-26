@@ -13,6 +13,7 @@ const expenseRoutes = require('./src/routes/expenseRoutes');
 const favoriteDestinationRoutes = require('./src/routes/favoriteDestinationRoutes');
 const sharedTripRoutes = require('./src/routes/sharedTripRoutes');
 const recommendationRoutes = require('./src/routes/recommendationRoutes');
+const path = require('path');
 
 const app = express();
 
@@ -38,6 +39,18 @@ app.use('/api', expenseRoutes);
 app.use('/api', favoriteDestinationRoutes);
 app.use('/api', sharedTripRoutes);
 app.use('/api', recommendationRoutes);
+
+// Serve frontend in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendDist = path.join(__dirname, '..', 'frontend', 'dist');
+  app.use(express.static(frontendDist));
+
+  app.get('*', (req, res, next) => {
+    // Allow API routes to continue
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
 
 // 404 Handler
 app.use((req, res) => {
