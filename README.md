@@ -1,154 +1,325 @@
-# Smart Travel Planner & Itinerary Builder API
+# ✈️ Smart Travel Planner & Itinerary Builder
 
-A comprehensive travel planning platform API built with Node.js, Express, and MongoDB.
+A full-stack travel planning platform that lets you plan trips, build day-by-day itineraries, track expenses, save favorite destinations, get smart recommendations, and share trips with friends — all in one beautifully designed app.
 
-## Features
+> **Monorepo:** React (Vite) frontend + Node/Express (MongoDB) backend.
 
-- User authentication and registration with JWT
-- Trip management (CRUD operations)
-- Itinerary building and management
-- Expense tracking
-- Favorite destinations
-- Trip sharing
-- Smart recommendations (AI-powered)
+---
 
-## Tech Stack
+## ✨ Features
 
-- **Backend:** Node.js, Express.js
-- **Database:** MongoDB with Mongoose ODM
-- **Authentication:** JWT
-- **Testing:** Mocha, Chai, Supertest
-- **Security:** Helmet, CORS, bcryptjs
+- 🔐 **Authentication** — JWT-based register/login with protected routes
+- 🧳 **Trip Management** — full CRUD with optimistic updates
+- 🗺️ **Itinerary Builder** — day-by-day activity planning
+- 💰 **Expense Tracking** — log costs and see running totals
+- ⭐ **Favorite Destinations** — save places you love
+- 🤝 **Trip Sharing** — generate public share links
+- 💡 **Smart Recommendations** — tailored trip ideas
+- 🎨 **Modern UI** — Tailwind CSS design system, responsive layout, warm travel-inspired palette
 
-## Prerequisites
+---
 
-- Node.js >= 16.0.0
-- npm >= 8.0.0
-- MongoDB Atlas account or local MongoDB instance
+## 🏗️ Tech Stack
 
-## Installation
+### Frontend
 
-1. Clone the repository:
+- **React 18** + **Vite 5**
+- **React Router v6** (routing, protected routes, lazy loading)
+- **TanStack Query v5** (server state, caching, mutations)
+- **React Hook Form** + **Zod** (forms & validation)
+- **Tailwind CSS 3** (custom design system)
+- **Axios** (API client with interceptors)
+- **Vitest** + **Testing Library** (tests)
+
+### Backend
+
+- **Node.js** + **Express**
+- **MongoDB** + **Mongoose** ODM
+- **JWT** authentication, **bcryptjs** password hashing
+- **Helmet**, **CORS**, **express-validator**, **morgan**
+- **Mocha** + **Chai** + **Supertest** (tests)
+
+---
+
+## 📁 Project Structure
+
+```
+STP-App/
+├── backend/                 # Node/Express API
+│   ├── app.js               # Express app (serves frontend build in production)
+│   ├── server.js            # Server bootstrap (port fallback, graceful shutdown)
+│   ├── src/
+│   │   ├── config/          # database & environment config
+│   │   ├── controllers/     # request handlers
+│   │   ├── middleware/      # auth, error handling, logging, validation
+│   │   ├── models/          # Mongoose schemas
+│   │   ├── repositories/    # data-access layer
+│   │   ├── routes/          # Express routers
+│   │   ├── services/        # business logic (AuthService, etc.)
+│   │   └── validators/      # request validators
+│   ├── scripts/             # helper scripts (smoke tests)
+│   └── tests/               # backend test suites
+│
+├── frontend/                # React (Vite) SPA
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── client.js     # axios instance + token/401 handling
+│   │   │   ├── endpoints.js  # centralized endpoint paths
+│   │   │   └── services/     # per-domain API services
+│   │   ├── components/
+│   │   │   ├── ui/           # reusable primitives (Button, Card, Input, …)
+│   │   │   └── layout/       # Navbar, Sidebar, MainLayout
+│   │   ├── context/          # AuthContext, UIContext
+│   │   ├── hooks/            # useTrips, useExpenses, useAuth, …
+│   │   ├── lib/              # queryKeys
+│   │   ├── pages/            # route pages
+│   │   ├── routes/           # AppRoutes, ProtectedRoute
+│   │   └── index.css         # Tailwind + design tokens
+│   ├── scripts/start-all.ps1 # starts backend + frontend together
+│   └── tailwind.config.js
+│
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** ≥ 18
+- **npm** ≥ 8
+- **MongoDB** (Atlas connection string or local instance)
+
+### 1. Clone
+
 ```bash
 git clone https://github.com/Kikunmi/Smart-Travel-Planner-App.git
 cd Smart-Travel-Planner-App
 ```
 
-2. Install dependencies:
+### 2. Backend setup
+
 ```bash
+cd backend
 npm install
 ```
 
-3. Create `.env` file from template:
-```bash
-cp .env.example .env
-```
+Create a `.env` file in `backend/`:
 
-4. Update `.env` with your configuration:
-```
+```env
 NODE_ENV=development
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
+JWT_EXPIRE=7d
 ```
 
-## Running the Application
+### 3. Frontend setup
 
-### Development
 ```bash
-npm run dev
+cd ../frontend
+npm install
 ```
 
-### Production
+Create a `.env` file in `frontend/`:
+
+```env
+VITE_API_URL=http://localhost:5000
+```
+
+---
+
+## 🏃 Running the App
+
+### Option A — Start both together (Windows / PowerShell)
+
+```powershell
+cd frontend
+npm run start-all
+```
+
+Starts the backend (`http://localhost:5000`) and the frontend (`http://localhost:5173`).
+
+### Option B — Run each separately
+
+**Backend**
+
 ```bash
+cd backend
+npm run dev      # nodemon (development)
+npm start        # production
+```
+
+**Frontend**
+
+```bash
+cd frontend
+npm run dev      # Vite dev server
+```
+
+Open **http://localhost:5173** in your browser.
+
+---
+
+## 🧪 Testing
+
+**Backend**
+
+```bash
+cd backend
+npm test                 # run all tests
+npm run test:coverage    # with coverage
+```
+
+**Frontend**
+
+```bash
+cd frontend
+npm test                 # run once
+npm run test:watch       # watch mode
+npm run test:coverage    # with coverage
+```
+
+Verify the auth flow end-to-end against a running backend:
+
+```powershell
+cd backend
+powershell -ExecutionPolicy Bypass -File .\scripts\smoke-auth.ps1
+```
+
+---
+
+## 📦 Production Build
+
+Build the frontend, then run the backend — in production the Express server serves the built SPA from `frontend/dist` and falls back to `index.html` for client-side routes.
+
+```bash
+# 1. Build the frontend
+cd frontend
+npm run build
+
+# 2. Start the backend in production mode
+cd ../backend
+$env:NODE_ENV="production"   # PowerShell (use `export NODE_ENV=production` on macOS/Linux)
 npm start
 ```
 
-### Testing
-```bash
-npm test
+The full app is then served from **http://localhost:5000**.
+
+---
+
+## 🔌 API Reference
+
+Base URL: `http://localhost:5000`
+
+### Health
+
+| Method | Endpoint      | Description          |
+| ------ | ------------- | -------------------- |
+| GET    | `/api/health` | Server health status |
+
+### Authentication
+
+| Method | Endpoint             | Description                  |
+| ------ | -------------------- | ---------------------------- |
+| POST   | `/api/auth/register` | Register a new user          |
+| POST   | `/api/auth/login`    | Login and receive a JWT      |
+| GET    | `/api/auth/profile`  | Get current user (protected) |
+
+> **Password rules:** minimum 6 characters, must include an uppercase letter, a lowercase letter, and a number.
+
+### Trips
+
+| Method | Endpoint              | Description         |
+| ------ | --------------------- | ------------------- |
+| GET    | `/api/trips`          | List trips          |
+| GET    | `/api/trips/upcoming` | List upcoming trips |
+| GET    | `/api/trips/:id`      | Get trip details    |
+| POST   | `/api/trips`          | Create a trip       |
+| PUT    | `/api/trips/:id`      | Update a trip       |
+| DELETE | `/api/trips/:id`      | Delete a trip       |
+
+### Itinerary
+
+| Method | Endpoint                               | Description         |
+| ------ | -------------------------------------- | ------------------- |
+| GET    | `/api/trips/:tripId/itinerary`         | Get itinerary items |
+| POST   | `/api/trips/:tripId/itinerary`         | Add an item         |
+| PUT    | `/api/trips/:tripId/itinerary/:itemId` | Update an item      |
+| DELETE | `/api/trips/:tripId/itinerary/:itemId` | Delete an item      |
+
+### Expenses
+
+| Method | Endpoint                                 | Description       |
+| ------ | ---------------------------------------- | ----------------- |
+| GET    | `/api/trips/:tripId/expenses`            | Get expenses      |
+| POST   | `/api/trips/:tripId/expenses`            | Add an expense    |
+| PUT    | `/api/trips/:tripId/expenses/:expenseId` | Update an expense |
+| DELETE | `/api/trips/:tripId/expenses/:expenseId` | Delete an expense |
+
+### Favorites
+
+| Method | Endpoint             | Description       |
+| ------ | -------------------- | ----------------- |
+| GET    | `/api/favorites`     | List favorites    |
+| POST   | `/api/favorites`     | Add a favorite    |
+| DELETE | `/api/favorites/:id` | Remove a favorite |
+
+### Recommendations
+
+| Method | Endpoint                             | Description                |
+| ------ | ------------------------------------ | -------------------------- |
+| GET    | `/api/recommendations`               | Get recommendations        |
+| GET    | `/api/trips/:tripId/recommendations` | Recommendations for a trip |
+
+### Sharing
+
+| Method | Endpoint                   | Description                 |
+| ------ | -------------------------- | --------------------------- |
+| POST   | `/api/trips/:tripId/share` | Create a share link         |
+| GET    | `/api/share/:shareId`      | View a shared trip (public) |
+| DELETE | `/api/share/:shareId`      | Revoke a share link         |
+
+---
+
+## 📐 Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│                React (Vite)                   │
+│  pages → hooks → api/services → axios client  │
+└──────────────────────┬────────────────────────┘
+                       │  HTTP (JSON, JWT)
+                       ▼
+┌─────────────────────────────────────────────┐
+│               Express REST API                │
+│  routes → controllers → services → repos      │
+│              → Mongoose models                │
+└──────────────────────┬────────────────────────┘
+                       ▼
+                  MongoDB (Atlas)
 ```
 
-## API Endpoints
+**Frontend data flow:** components call domain **hooks** (React Query) → hooks call **services** → services use the shared **axios client** (auto-attaches the JWT, normalizes errors, auto-logout on 401).
 
-### Health Check
-- `GET /api/health` - Server health status
+**Backend layers:** **routes** → **controllers** → **services** (business logic) → **repositories** (data access) → **Mongoose models**.
 
-### Authentication (Phase 3)
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
+---
 
-### Trips (Phase 5)
-- `GET /api/trips` - Get all user trips
-- `GET /api/trips/:id` - Get trip details
-- `POST /api/trips` - Create new trip
-- `PUT /api/trips/:id` - Update trip
-- `DELETE /api/trips/:id` - Delete trip
+## 🔁 Standard Response Format
 
-### Itinerary (Phase 6)
-- `GET /api/trips/:tripId/itinerary` - Get itinerary
-- `POST /api/trips/:tripId/itinerary` - Add activity
-- `PUT /api/itinerary/:id` - Update activity
-- `DELETE /api/itinerary/:id` - Delete activity
+**Success**
 
-### Expenses (Phase 7)
-- `GET /api/trips/:tripId/expenses` - Get expenses
-- `POST /api/trips/:tripId/expenses` - Add expense
-
-### Recommendations (Phase 10)
-- `POST /api/recommendations/generate` - Generate recommendations
-
-## Development Roadmap
-
-- Phase 1: ✅ Project Setup
-- Phase 2: Database Connection
-- Phase 3: Authentication
-- Phase 4: User Management
-- Phase 5: Trip CRUD
-- Phase 6: Itinerary CRUD
-- Phase 7: Expense Tracking
-- Phase 8: Favorite Destinations
-- Phase 9: Trip Sharing
-- Phase 10: Recommendation Engine
-- Phase 11: Validation
-- Phase 12: Testing
-- Phase 13: Deployment
-
-## Architecture
-
-```
-Frontend
-  |
-  v
-REST API (Express)
-  |
-  v
-Controllers (Request Validation)
-  |
-  v
-Services (Business Logic)
-  |
-  v
-Models (Database Operations)
-  |
-  v
-MongoDB Atlas
-```
-
-## Error Handling
-
-All endpoints return standardized responses:
-
-**Success:**
 ```json
 {
   "status": "success",
-  "message": "Operation successful",
   "data": {}
 }
 ```
 
-**Error:**
+**Error**
+
 ```json
 {
   "status": "error",
@@ -156,6 +327,8 @@ All endpoints return standardized responses:
 }
 ```
 
-## License
+---
 
-MIT License - see LICENSE file
+## 📄 License
+
+MIT License — see [LICENSE](backend/LICENSE).
