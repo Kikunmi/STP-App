@@ -20,7 +20,7 @@ export const useCreateItineraryItem = (tripId) => {
 export const useUpdateItineraryItem = (tripId) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, payload }) => itineraryService.update(tripId, itemId, payload),
+    mutationFn: ({ itemId, payload }) => itineraryService.update(itemId, payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.itinerary.all(tripId) }),
   });
 };
@@ -28,15 +28,7 @@ export const useUpdateItineraryItem = (tripId) => {
 export const useDeleteItineraryItem = (tripId) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (itemId) => itineraryService.remove(tripId, itemId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.itinerary.all(tripId) }),
-  });
-};
-
-export const useReorderItinerary = (tripId) => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (ordering) => itineraryService.reorder(tripId, ordering),
+    mutationFn: (itemId) => itineraryService.remove(itemId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.itinerary.all(tripId) }),
   });
 };

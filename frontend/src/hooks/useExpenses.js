@@ -20,7 +20,7 @@ export const useCreateExpense = (tripId) => {
 export const useUpdateExpense = (tripId) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ expenseId, payload }) => expenseService.update(tripId, expenseId, payload),
+    mutationFn: ({ expenseId, payload }) => expenseService.update(expenseId, payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.expenses.all(tripId) }),
   });
 };
@@ -28,7 +28,7 @@ export const useUpdateExpense = (tripId) => {
 export const useDeleteExpense = (tripId) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (expenseId) => expenseService.remove(tripId, expenseId),
+    mutationFn: (expenseId) => expenseService.remove(expenseId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.expenses.all(tripId) }),
   });
 };

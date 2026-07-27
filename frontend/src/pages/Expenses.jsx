@@ -7,16 +7,24 @@ export default function Expenses() {
   const { tripId } = useParams();
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('other');
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
 
   const { data: expenses, isLoading, isError, error } = useExpenses(tripId);
   const createMutation = useCreateExpense(tripId);
   const deleteMutation = useDeleteExpense(tripId);
 
   const addExpense = async () => {
-    if (!title || !amount) return;
-    await createMutation.mutateAsync({ title, amount: parseFloat(amount) });
+    if (!title || !amount || !date) return;
+    await createMutation.mutateAsync({
+      title,
+      amount: parseFloat(amount),
+      category,
+      date: new Date(date).toISOString(),
+    });
     setTitle('');
     setAmount('');
+    setCategory('other');
   };
 
   if (isLoading) return <Loading message="Loading expenses..." />;
@@ -40,18 +48,53 @@ export default function Expenses() {
         </div>
       </header>
 
-      <div className="card-base flex flex-col sm:flex-row gap-3">
-        <Input placeholder="What did you spend on?" value={title} onChange={(e) => setTitle(e.target.value)} />
-        <Input
-          placeholder="Amount"
-          type="number"
-          className="sm:max-w-[10rem]"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <Button onClick={addExpense} isLoading={createMutation.isPending}>
-          {createMutation.isPending ? 'Adding...' : 'Add Expense'}
-        </Button>
+      <div className="card-base flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Input
+            placeholder="What did you spend on?"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <Input
+            placeholder="Amount"
+            type="number"
+            min="0"
+            step="0.01"
+            className="sm:max-w-[10rem]"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <select
+            className="input-base sm:max-w-[12rem]"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            aria-label="Category"
+          >
+            <option value="transport">Transport</option>
+            <option value="accommodation">Accommodation</option>
+            <option value="food">Food</option>
+            <option value="activity">Activity</option>
+            <option value="shopping">Shopping</option>
+            <option value="other">Other</option>
+          </select>
+          <Input
+            type="date"
+            className="sm:max-w-[12rem]"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            aria-label="Date"
+          />
+          <Button onClick={addExpense} isLoading={createMutation.isPending} className="sm:ml-auto">
+            {createMutation.isPending ? 'Adding...' : 'Add Expense'}
+          </Button>
+        </div>
+        {createMutation.isError && (
+          <div className="text-sm text-[var(--color-danger)]">
+            {createMutation.error?.normalizedMessage || 'Failed to add expense'}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-3">

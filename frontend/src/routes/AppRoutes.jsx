@@ -27,7 +27,6 @@ export default function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/share/:shareId" element={<SharedView />} />
 
         {/* Protected routes wrapped by the app shell */}
         <Route
@@ -45,6 +44,7 @@ export default function AppRoutes() {
           <Route path="/trips/:tripId/itinerary" element={<Itinerary />} />
           <Route path="/trips/:tripId/expenses" element={<Expenses />} />
           <Route path="/trips/:tripId/share" element={<ShareTrip />} />
+          <Route path="/shared-with-me" element={<SharedView />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/recommendations" element={<Recommendations />} />
         </Route>

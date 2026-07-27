@@ -15,12 +15,11 @@ export const ENDPOINTS = {
   },
   itinerary: {
     base: (tripId) => `/api/trips/${tripId}/itinerary`,
-    byId: (tripId, itemId) => `/api/trips/${tripId}/itinerary/${itemId}`,
-    reorder: (tripId) => `/api/trips/${tripId}/itinerary/reorder`,
+    byId: (itemId) => `/api/itinerary/${itemId}`,
   },
   expenses: {
     base: (tripId) => `/api/trips/${tripId}/expenses`,
-    byId: (tripId, expenseId) => `/api/trips/${tripId}/expenses/${expenseId}`,
+    byId: (expenseId) => `/api/expenses/${expenseId}`,
   },
   favorites: {
     base: '/api/favorite-destinations',
@@ -33,7 +32,9 @@ export const ENDPOINTS = {
   },
   sharing: {
     share: (tripId) => `/api/trips/${tripId}/share`,
-    shared: (shareId) => `/api/share/${shareId}`,
+    listShares: (tripId) => `/api/trips/${tripId}/shares`,
+    unshare: (tripId, sharedUserId) => `/api/trips/${tripId}/share/${sharedUserId}`,
+    sharedWithMe: '/api/shared-trips',
   },
 };
 

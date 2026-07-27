@@ -1,32 +1,45 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
-import { useSharedTrip } from '../hooks/useSharing';
-import { Card, Loading } from '../components/ui';
+import { Link } from 'react-router-dom';
+import { useSharedWithMe } from '../hooks/useSharing';
+import { Card, Loading, EmptyState } from '../components/ui';
 
 export default function SharedView() {
-  const { shareId } = useParams();
-  const { data, isLoading, isError, error } = useSharedTrip(shareId);
+  const { data: shared, isLoading, isError, error } = useSharedWithMe();
 
-  if (isLoading) return <Loading message="Loading shared trip..." />;
+  if (isLoading) return <Loading message="Loading shared trips..." />;
   if (isError) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="text-[var(--color-danger)]">
-          {error?.normalizedMessage || 'Failed to load shared trip'}
-        </div>
+      <div className="text-[var(--color-danger)]">
+        {error?.normalizedMessage || 'Failed to load shared trips'}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen hero-bg p-6 flex items-center justify-center">
-      <div className="w-full max-w-2xl flex flex-col gap-4">
-        <h1 className="text-3xl font-bold gradient-text">{data?.title}</h1>
-        <Card>
-          <p className="text-slate-600">{data?.destination}</p>
-          {data?.description && <p className="mt-2">{data.description}</p>}
-        </Card>
-      </div>
-    </div>
+    <section className="flex flex-col gap-6">
+      <h1 className="text-2xl font-bold">Shared With Me</h1>
+      {shared?.length ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {shared.map((entry) => (
+            <Link key={entry.shareId} to={`/trips/${entry.trip._id}`}>
+              <Card hover className="flex flex-col gap-1">
+                <h3 className="font-bold text-slate-900">{entry.trip.title}</h3>
+                <p className="text-sm text-slate-500">{entry.trip.destination}</p>
+                {entry.owner?.username && (
+                  <span className="text-xs text-slate-400 mt-2">
+                    Shared by {entry.owner.username}
+                  </span>
+                )}
+              </Card>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          title="No trips shared with you"
+          subtitle="When someone shares a trip with you, it will appear here."
+        />
+      )}
+    </section>
   );
 }

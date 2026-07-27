@@ -26,7 +26,8 @@ export const queryKeys = {
     forTrip: (tripId) => ['recommendations', tripId],
   },
   sharing: {
-    shared: (shareId) => ['shared', shareId],
+    tripShares: (tripId) => ['shares', tripId],
+    sharedWithMe: ['shared-with-me'],
   },
 };
 

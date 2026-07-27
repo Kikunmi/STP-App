@@ -1,19 +1,32 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useItinerary, useCreateItineraryItem } from '../hooks/useItinerary';
+import {
+  useItinerary,
+  useCreateItineraryItem,
+  useUpdateItineraryItem,
+  useDeleteItineraryItem,
+} from '../hooks/useItinerary';
 import { Loading, ItineraryItem, Button, Input, EmptyState } from '../components/ui';
 
 export default function Itinerary() {
   const { tripId } = useParams();
-  const [newTitle, setNewTitle] = useState('');
+  const [title, setTitle] = useState('');
+  const [activityDate, setActivityDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [time, setTime] = useState('09:00');
 
-  const { data, isLoading, isError, error } = useItinerary(tripId);
+  const { data: items, isLoading, isError, error } = useItinerary(tripId);
   const createMutation = useCreateItineraryItem(tripId);
+  const updateMutation = useUpdateItineraryItem(tripId);
+  const deleteMutation = useDeleteItineraryItem(tripId);
 
   const handleAdd = async () => {
-    if (!newTitle) return;
-    await createMutation.mutateAsync({ title: newTitle });
-    setNewTitle('');
+    if (!title || !activityDate || !time) return;
+    await createMutation.mutateAsync({
+      title,
+      activityDate: new Date(activityDate).toISOString(),
+      time,
+    });
+    setTitle('');
   };
 
   if (isLoading) return <Loading message="Loading itinerary..." />;
@@ -25,26 +38,58 @@ export default function Itinerary() {
     );
   }
 
-  const items = data?.items || data || [];
+  const list = Array.isArray(items) ? items : [];
 
   return (
     <section className="flex flex-col gap-6">
       <h1 className="text-2xl font-bold">Itinerary</h1>
 
-      <div className="flex gap-2 max-w-xl">
+      <div className="card-base flex flex-col gap-3">
         <Input
           placeholder="Add an activity..."
-          value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
-        <Button onClick={handleAdd} disabled={createMutation.isPending}>
-          {createMutation.isPending ? 'Adding...' : 'Add'}
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Input
+            type="date"
+            className="sm:max-w-[12rem]"
+            value={activityDate}
+            onChange={(e) => setActivityDate(e.target.value)}
+            aria-label="Activity date"
+          />
+          <Input
+            type="time"
+            className="sm:max-w-[8rem]"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            aria-label="Time"
+          />
+          <Button onClick={handleAdd} isLoading={createMutation.isPending} className="sm:ml-auto">
+            {createMutation.isPending ? 'Adding...' : 'Add Activity'}
+          </Button>
+        </div>
+        {createMutation.isError && (
+          <div className="text-sm text-[var(--color-danger)]">
+            {createMutation.error?.normalizedMessage || 'Failed to add activity'}
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        {items.length ? (
-          items.map((item) => <ItineraryItem key={item.id || item._id} item={item} />)
+      <div className="flex flex-col gap-3">
+        {list.length ? (
+          list.map((item) => {
+            const itemId = item.id || item._id;
+            return (
+              <ItineraryItem
+                key={itemId}
+                item={item}
+                isSaving={updateMutation.isPending}
+                onUpdate={(payload) => updateMutation.mutateAsync({ itemId, payload })}
+                onDelete={() => deleteMutation.mutate(itemId)}
+              />
+            );
+          })
         ) : (
           <EmptyState title="No itinerary items" subtitle="Plan your day by adding activities." />
         )}
