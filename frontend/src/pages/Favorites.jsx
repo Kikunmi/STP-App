@@ -7,18 +7,18 @@ import {
 import { Loading, FavoriteItem, Button, Input, EmptyState } from '../components/ui';
 
 export default function Favorites() {
-  const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
+  const [destinationName, setDestinationName] = useState('');
+  const [country, setCountry] = useState('');
 
   const { data: favorites, isLoading, isError, error } = useFavorites();
   const createMutation = useCreateFavorite();
   const deleteMutation = useDeleteFavorite();
 
   const handleAdd = async () => {
-    if (!name || !location) return;
-    await createMutation.mutateAsync({ name, location });
-    setName('');
-    setLocation('');
+    if (!destinationName || !country) return;
+    await createMutation.mutateAsync({ destinationName, country });
+    setDestinationName('');
+    setCountry('');
   };
 
   if (isLoading) return <Loading message="Loading favorites..." />;
@@ -34,22 +34,40 @@ export default function Favorites() {
     <section className="flex flex-col gap-6">
       <h1 className="text-2xl font-bold">Favorite Destinations</h1>
 
-      <div className="flex flex-col sm:flex-row gap-2 max-w-xl">
-        <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <Input placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
-        <Button onClick={handleAdd} disabled={createMutation.isPending}>
+      <div className="card-base flex flex-col sm:flex-row gap-3">
+        <Input
+          placeholder="Destination (e.g. Santorini)"
+          value={destinationName}
+          onChange={(e) => setDestinationName(e.target.value)}
+        />
+        <Input
+          placeholder="Country (e.g. Greece)"
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+        />
+        <Button onClick={handleAdd} isLoading={createMutation.isPending}>
           {createMutation.isPending ? 'Adding...' : 'Add'}
         </Button>
       </div>
 
-      <div className="flex flex-col gap-2">
+      {createMutation.isError && (
+        <div className="text-sm text-[var(--color-danger)]">
+          {createMutation.error?.normalizedMessage || 'Failed to add favorite'}
+        </div>
+      )}
+
+      <div className="flex flex-col gap-3">
         {favorites?.length ? (
           favorites.map((fav) => (
             <div key={fav.id || fav._id} className="flex items-center gap-2">
               <div className="flex-1">
                 <FavoriteItem fav={fav} />
               </div>
-              <Button variant="ghost" onClick={() => deleteMutation.mutate(fav.id || fav._id)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => deleteMutation.mutate(fav.id || fav._id)}
+              >
                 Remove
               </Button>
             </div>

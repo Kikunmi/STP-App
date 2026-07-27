@@ -10,7 +10,7 @@ export const ENDPOINTS = {
   },
   trips: {
     base: '/api/trips',
-    upcoming: '/api/trips/upcoming',
+    upcoming: '/api/trips/filter/upcoming',
     byId: (id) => `/api/trips/${id}`,
   },
   itinerary: {
@@ -23,11 +23,12 @@ export const ENDPOINTS = {
     byId: (tripId, expenseId) => `/api/trips/${tripId}/expenses/${expenseId}`,
   },
   favorites: {
-    base: '/api/favorites',
-    byId: (id) => `/api/favorites/${id}`,
+    base: '/api/favorite-destinations',
+    byId: (id) => `/api/favorite-destinations/${id}`,
   },
   recommendations: {
     base: '/api/recommendations',
+    generate: '/api/recommendations/generate',
     forTrip: (tripId) => `/api/trips/${tripId}/recommendations`,
   },
   sharing: {

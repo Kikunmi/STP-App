@@ -4,12 +4,12 @@ import { ENDPOINTS } from '../endpoints';
 export const favoriteService = {
   async getAll() {
     const { data } = await api.get(ENDPOINTS.favorites.base);
-    return data?.data ?? data;
+    return data?.data?.favorites ?? data?.data ?? data;
   },
 
   async create(payload) {
     const { data } = await api.post(ENDPOINTS.favorites.base, payload);
-    return data?.data ?? data;
+    return data?.data?.favorite ?? data?.data ?? data;
   },
 
   async remove(id) {

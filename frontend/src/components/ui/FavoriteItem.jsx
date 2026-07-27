@@ -11,11 +11,17 @@ export default function FavoriteItem({ fav }) {
           </svg>
         </div>
         <div>
-          <div className="font-semibold text-slate-900">{fav.name}</div>
-          <div className="text-sm text-slate-500">{fav.location}</div>
+          <div className="font-semibold text-slate-900">{fav.destinationName || fav.name}</div>
+          <div className="text-sm text-slate-500">
+            {[fav.city, fav.country || fav.location].filter(Boolean).join(', ')}
+          </div>
         </div>
       </div>
-      {fav.type && <span className="badge bg-slate-100 text-slate-500">{fav.type}</span>}
+      {typeof fav.rating === 'number' ? (
+        <span className="badge bg-sand-100 text-sand-500">★ {fav.rating}</span>
+      ) : (
+        fav.type && <span className="badge bg-slate-100 text-slate-500">{fav.type}</span>
+      )}
     </div>
   );
 }

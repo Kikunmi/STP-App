@@ -6,12 +6,26 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTrip, useCreateTrip, useUpdateTrip } from '../hooks/useTrips';
 import { Input, Button, Loading } from '../components/ui';
 
-const schema = z.object({
-  title: z.string().min(2, { message: 'Title is too short' }),
-  destination: z.string().min(2, { message: 'Destination is too short' }),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-});
+const schema = z
+  .object({
+    title: z.string().min(3, { message: 'Title must be at least 3 characters' }),
+    destination: z.string().min(2, { message: 'Destination is too short' }),
+    startDate: z.string().min(1, { message: 'Start date is required' }),
+    endDate: z.string().min(1, { message: 'End date is required' }),
+  })
+  .refine(
+    (data) => {
+      const start = new Date(data.startDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return start >= today;
+    },
+    { message: 'Start date must be today or later', path: ['startDate'] }
+  )
+  .refine((data) => new Date(data.endDate) > new Date(data.startDate), {
+    message: 'End date must be after start date',
+    path: ['endDate'],
+  });
 
 export default function TripForm() {
   const { tripId } = useParams();
@@ -44,10 +58,17 @@ export default function TripForm() {
   const mutationError = createMutation.error || updateMutation.error;
 
   const onSubmit = async (values) => {
+    // Backend expects ISO 8601 datetimes and a start date strictly in the future.
+    const payload = {
+      ...values,
+      startDate: new Date(values.startDate).toISOString(),
+      endDate: new Date(values.endDate).toISOString(),
+    };
+
     if (isEdit) {
-      await updateMutation.mutateAsync({ id: tripId, payload: values });
+      await updateMutation.mutateAsync({ id: tripId, payload });
     } else {
-      await createMutation.mutateAsync(values);
+      await createMutation.mutateAsync(payload);
     }
     navigate('/trips');
   };

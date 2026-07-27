@@ -113,6 +113,52 @@ class RecommendationController {
       }
     });
   });
+
+  /**
+   * Get current user's recommendations
+   * GET /api/recommendations
+   */
+  static getMyRecommendations = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const { page = 1, limit = 10 } = req.query;
+
+    const result = await recommendationRepository.findByUser(userId, {
+      page: parseInt(page, 10),
+      limit: Math.min(parseInt(limit, 10), 100)
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        recommendations: result.recommendations,
+        pagination: {
+          total: result.total,
+          page: result.page,
+          limit: result.limit,
+          pages: result.pages
+        }
+      }
+    });
+  });
+
+  /**
+   * Get recommendations for a specific trip
+   * GET /api/trips/:tripId/recommendations
+   */
+  static getTripRecommendations = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const { tripId } = req.params;
+
+    const recommendations = await recommendationRepository.findByTrip(tripId, userId);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        recommendations,
+        count: recommendations.length
+      }
+    });
+  });
 }
 
 module.exports = RecommendationController;

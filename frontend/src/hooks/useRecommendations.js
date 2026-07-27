@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { recommendationService } from '../api/services';
 import { queryKeys } from '../lib/queryKeys';
 
@@ -14,3 +14,18 @@ export const useTripRecommendations = (tripId) =>
     queryFn: () => recommendationService.getForTrip(tripId),
     enabled: !!tripId,
   });
+
+export const useGenerateRecommendations = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload) => recommendationService.generate(payload),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.recommendations.all });
+      if (variables?.tripId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.recommendations.forTrip(variables.tripId),
+        });
+      }
+    },
+  });
+};
