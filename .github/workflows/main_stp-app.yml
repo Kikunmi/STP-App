@@ -51,8 +51,20 @@ jobs:
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
+      administration: write #This is required to configure the OIDC subject claim format
 
     steps:
+      - name: Configure OIDC subject claim format
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.request('PUT /repos/{owner}/{repo}/actions/oidc/customization/sub', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              use_default: false,
+              include_claim_keys: ['repo', 'ref']
+            });
+
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
