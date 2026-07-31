@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: '22.x'
 
-      - name: npm install, build, and test
+      - name: Install and test backend
         run: |
           npm install
           npm run build --if-present
@@ -39,11 +39,23 @@ jobs:
           MONGODB_URI: mongodb://127.0.0.1:27017/smart-travel-planner-test
           JWT_SECRET: ci_test_jwt_secret
 
+      - name: Build frontend
+        run: |
+          npm install
+          npm run build
+        working-directory: ./frontend
+        env:
+          VITE_API_URL: /
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ./backend
+          path: .
+          exclude: |
+            .git
+            frontend/node_modules
+            backend/node_modules
 
   deploy:
     runs-on: ubuntu-latest
@@ -84,4 +96,5 @@ jobs:
           app-name: 'STP-App'
           slot-name: 'Production'
           package: .
+          startup-command: node backend/server.js
           
