@@ -19,7 +19,20 @@ const app = express();
 
 // Security Middleware
 app.use(helmet());
-app.use(cors());
+
+// CORS — restrict to configured origins in production (comma-separated CORS_ORIGIN).
+// Falls back to allowing all origins when CORS_ORIGIN is not set (local/dev).
+const allowedOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins.length ? allowedOrigins : true,
+    credentials: true,
+  })
+);
 
 // Parsing Middleware
 app.use(express.json());
